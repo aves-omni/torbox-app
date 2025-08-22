@@ -69,7 +69,7 @@ const nextConfig = {
         compression: 'gzip',
         maxAge: 172800000, // 2 days
         buildDependencies: {
-          config: [__filename], // Only rebuild when next.config.js changes
+          config: [import.meta.url], // Use import.meta.url instead of __filename
         },
         cacheDirectory: '.next/cache/webpack', // Specify cache directory
         name: 'webpack-cache', // Name the cache
