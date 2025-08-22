@@ -16,6 +16,11 @@ RUN --mount=type=cache,target=/root/.npm \
 FROM node:22-alpine AS builder
 WORKDIR /app
 
+# Disable Next.js telemetry
+ENV NEXT_TELEMETRY_DISABLED=1
+# Add build performance optimizations
+ENV NODE_OPTIONS="--max-old-space-size=4096 --max-http-header-size=8192"
+
 # Install build dependencies
 RUN apk add --no-cache libc6-compat
 
@@ -31,10 +36,13 @@ COPY . .
 
 # Build the application with optimizations
 RUN --mount=type=cache,target=/app/.next/cache \
-    npm run build
+    NEXT_WEBPACK_MEMORY_LIMIT=4096 npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
+
+# Disable Next.js telemetry in production as well
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install runtime dependencies
 RUN apk add --no-cache dumb-init

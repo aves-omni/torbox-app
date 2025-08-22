@@ -68,7 +68,16 @@ const nextConfig = {
         type: 'filesystem',
         compression: 'gzip',
         maxAge: 172800000, // 2 days
+        buildDependencies: {
+          config: [__filename], // Only rebuild when next.config.js changes
+        },
+        cacheDirectory: '.next/cache/webpack', // Specify cache directory
+        name: 'webpack-cache', // Name the cache
+        version: '1.0', // Cache version
       };
+      
+      // Use SWC minifier for faster builds
+      config.swcMinify = true;
     }
     
     return config;
