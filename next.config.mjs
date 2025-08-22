@@ -1,73 +1,75 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import withPWA from 'next-pwa';
 import createNextIntlPlugin from 'next-intl/plugin';
-import path from 'path'; // Add this import
 
 const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  swcMinify: true, // Move this here from webpack config
   
   // Optimize bundle size
   experimental: {
     optimizePackageImports: ['lodash', 'date-fns', 'chart.js'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   
-  // Handle SVG files
+  // Compress static assets
+  compress: true,
+  
+  // Optimize images
+  images: {
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+  },
+  
+  // Webpack optimizations
   webpack: (config, { dev, isServer }) => {
-    // Add SVG handling
-    config.module = config.module || {};
-    config.module.rules = config.module.rules || [];
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ['@svgr/webpack'],
-    });
-    
-    // Rest of webpack config...
     // Bundle analyzer
     if (process.env.ANALYZE === 'true') {
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
       config.plugins.push(
         new BundleAnalyzerPlugin({
           analyzerMode: 'static',
+          openAnalyzer: false,
+          reportFilename: 'bundle-analysis.html',
         })
       );
     }
     
-    // Optimize code splitting
-    config.optimization.splitChunks = {
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
+    // Optimize bundle splitting
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            enforce: true,
+          },
         },
-        common: {
-          name: 'common',
-          minChunks: 2,
-          chunks: 'all',
-          enforce: true,
-        },
-      },
-    };
-    
-    // Optimize cache performance
-    config.cache = {
-      type: 'filesystem',
-      compression: 'gzip',
-      maxAge: 172800000, // 2 days
-      buildDependencies: {
-        config: [import.meta.url], // Already using import.meta.url
-      },
-      cacheDirectory: path.resolve(process.cwd(), '.next/cache/webpack'), // Use absolute path
-      name: 'webpack-cache', // Name the cache
-      version: '1.0', // Cache version
-    };
-    
-    // Removed swcMinify from here - it's now at the top level
+      };
+      
+      // Optimize cache performance
+      config.cache = {
+        type: 'filesystem',
+        compression: 'gzip',
+        maxAge: 172800000, // 2 days
+      };
+    }
     
     return config;
   },
