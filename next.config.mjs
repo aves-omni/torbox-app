@@ -1,17 +1,20 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import withPWA from 'next-pwa';
 import createNextIntlPlugin from 'next-intl/plugin';
+import path from 'path'; // Add this import
 
 const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  swcMinify: true, // Move this here from webpack config
   
   // Optimize bundle size
   experimental: {
     optimizePackageImports: ['lodash', 'date-fns', 'chart.js'],
-    turbo: {
+    // Update deprecated turbo to turbopack
+    turbopack: {
       rules: {
         '*.svg': {
           loaders: ['@svgr/webpack'],
@@ -38,47 +41,42 @@ const nextConfig = {
       config.plugins.push(
         new BundleAnalyzerPlugin({
           analyzerMode: 'static',
-          openAnalyzer: false,
-          reportFilename: 'bundle-analysis.html',
         })
       );
     }
     
-    // Optimize bundle splitting
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            enforce: true,
-          },
+    // Optimize code splitting
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
         },
-      };
-      
-      // Optimize cache performance
-      config.cache = {
-        type: 'filesystem',
-        compression: 'gzip',
-        maxAge: 172800000, // 2 days
-        buildDependencies: {
-          config: [import.meta.url], // Use import.meta.url instead of __filename
+        common: {
+          name: 'common',
+          minChunks: 2,
+          chunks: 'all',
+          enforce: true,
         },
-        cacheDirectory: '.next/cache/webpack', // Specify cache directory
-        name: 'webpack-cache', // Name the cache
-        version: '1.0', // Cache version
-      };
-      
-      // Use SWC minifier for faster builds
-      config.swcMinify = true;
-    }
+      },
+    };
+    
+    // Optimize cache performance
+    config.cache = {
+      type: 'filesystem',
+      compression: 'gzip',
+      maxAge: 172800000, // 2 days
+      buildDependencies: {
+        config: [import.meta.url], // Already using import.meta.url
+      },
+      cacheDirectory: path.resolve(process.cwd(), '.next/cache/webpack'), // Use absolute path
+      name: 'webpack-cache', // Name the cache
+      version: '1.0', // Cache version
+    };
+    
+    // Removed swcMinify from here - it's now at the top level
     
     return config;
   },
