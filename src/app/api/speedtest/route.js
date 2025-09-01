@@ -25,8 +25,11 @@ export async function GET(request) {
     // Build query parameters
     const params = new URLSearchParams();
     if (userIp && userIp !== 'unknown') params.append('user_ip', userIp);
-    if (region) params.append('region', region);
     if (testLength) params.append('test_length', testLength);
+    
+    // Only specify region if explicitly requested
+    // This allows us to get all servers when no region is specified
+    if (region) params.append('region', region);
 
     const response = await fetch(
       `${API_BASE}/${API_VERSION}/api/speedtest?${params}`,

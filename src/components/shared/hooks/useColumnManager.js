@@ -6,6 +6,7 @@ export function useColumnManager(activeType = 'torrents') {
   const [activeColumns, setActiveColumns] = useState(() => {
     // Default columns for each type - used for initial server-side rendering
     const defaultColumns = {
+      all: ['id', 'name', 'size', 'created_at', 'download_state', 'asset_type', 'download_progress'],
       torrents: ['id', 'name', 'size', 'created_at', 'download_state', 'download_progress'],
       usenet: ['id', 'name', 'size', 'created_at', 'download_state', 'download_progress'],
       webdl: [
@@ -34,6 +35,7 @@ export function useColumnManager(activeType = 'torrents') {
 
     // Default columns for each type
     const defaultColumns = {
+      all: ['id', 'name', 'size', 'created_at', 'download_state', 'asset_type', 'download_progress'],
       torrents: ['id', 'name', 'size', 'created_at', 'download_state', 'download_progress'],
       usenet: ['id', 'name', 'size', 'created_at', 'download_state', 'download_progress'],
       webdl: [
@@ -57,7 +59,16 @@ export function useColumnManager(activeType = 'torrents') {
       // Filter for valid columns that are applicable to this asset type
       const validColumns = storedColumns.filter((col) => {
         const column = COLUMNS[col];
-        // Include column if it exists and either has no assetTypes restriction or includes the current type
+        // For "all" tab, include columns that are either universal or specifically allowed for "all"
+        if (activeType === 'all') {
+          return (
+            column &&
+            (!column.assetTypes || 
+             column.assetTypes.includes('all') || 
+             column.assetTypes.includes(activeType))
+          );
+        }
+        // For specific tabs, include column if it exists and either has no assetTypes restriction or includes the current type
         return (
           column &&
           (!column.assetTypes || column.assetTypes.includes(activeType))
@@ -87,6 +98,7 @@ export function useColumnManager(activeType = 'torrents') {
     const stored = localStorage.getItem(storageKey);
 
     const defaultColumns = {
+      all: ['id', 'name', 'size', 'created_at', 'download_state', 'asset_type', 'download_progress'],
       torrents: ['id', 'name', 'size', 'created_at', 'download_state', 'download_progress'],
       usenet: ['id', 'name', 'size', 'created_at', 'download_state', 'download_progress'],
       webdl: [
@@ -110,6 +122,15 @@ export function useColumnManager(activeType = 'torrents') {
       // Filter for valid columns that are applicable to this asset type
       const validColumns = storedColumns.filter((col) => {
         const column = COLUMNS[col];
+        // For "all" tab, include columns that are either universal or specifically allowed for "all"
+        if (activeType === 'all') {
+          return (
+            column &&
+            (!column.assetTypes || 
+             column.assetTypes.includes('all') || 
+             column.assetTypes.includes(activeType))
+          );
+        }
         return (
           column &&
           (!column.assetTypes || column.assetTypes.includes(activeType))
@@ -134,6 +155,15 @@ export function useColumnManager(activeType = 'torrents') {
     // Filter for valid columns that are applicable to this asset type
     const validColumns = newColumns.filter((col) => {
       const column = COLUMNS[col];
+      // For "all" tab, include columns that are either universal or specifically allowed for "all"
+      if (activeType === 'all') {
+        return (
+          column &&
+          (!column.assetTypes || 
+           column.assetTypes.includes('all') || 
+           column.assetTypes.includes(activeType))
+        );
+      }
       return (
         column && (!column.assetTypes || column.assetTypes.includes(activeType))
       );

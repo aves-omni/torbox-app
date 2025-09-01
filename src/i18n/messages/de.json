@@ -153,7 +153,9 @@
     "hideSensitive": "Vertraulichen Inhalt ausblenden ",
     "showSensitive": "Vertraulichen Inhalt anzeigen",
     "enterFullscreen": "In den Vollbildmodus wechseln ",
-    "exitFullscreen": "Vollbildmodus verlassen"
+    "exitFullscreen": "Vollbildmodus verlassen",
+    "expandAllFiles": "Alle Dateien erweitern",
+    "collapseAllFiles": "Alle Dateien reduzieren"
   },
   "ColumnManager": {
     "reorderColumns": "Spalten neu anordnen ",
@@ -161,6 +163,8 @@
   },
   "Common": {
     "itemTypes": {
+      "all": "alle",
+      "All": "Alle",
       "torrent": "torrent",
       "Torrent": "Torrent ",
       "torrents": "torrents",
@@ -374,6 +378,7 @@
     "peers": "Peers",
     "original_url": "Quell-URL ",
     "expires_at": "Ablaufdatum",
+    "asset_type": "Typ",
     "actions": "Aktionen"
   },
   "Statuses": {
