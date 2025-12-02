@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { isQueuedItem, getAutoStartOptions, sortItems } from '@/utils/utility';
 import { retryFetch } from '@/utils/retryFetch';
+import { validateUserData } from '@/utils/monitoring';
+import { perfMonitor } from '@/utils/performance';
 
 // Rate limit constants
 const MAX_CALLS = 5;
@@ -18,7 +20,7 @@ const AUTOMATION_POLLING_INTERVAL = 300000; // 5 minutes in ms
 // 3. ✅ No polling when browser is not focused AND (auto-start is disabled OR no queued torrents)
 
 export function useFetchData(apiKey, type = 'torrents') {
-  // Separate state for each data type
+  // Separate state for each data type - ensure they're always arrays
   const [torrents, setTorrents] = useState([]);
   const [usenetItems, setUsenetItems] = useState([]);
   const [webdlItems, setWebdlItems] = useState([]);
@@ -47,7 +49,7 @@ export function useFetchData(apiKey, type = 'torrents') {
     webdlRef.current = webdlItems;
   }, [webdlItems]);
 
-  // One-time effect to fetch all data types on initial mount
+  // Fetch all data types on initial mount and when API key changes
   useEffect(() => {
     const fetchAllTypes = async () => {
       if (!apiKey) return;
@@ -60,8 +62,7 @@ export function useFetchData(apiKey, type = 'torrents') {
     };
 
     fetchAllTypes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [apiKey]);
 
   const isRateLimited = useCallback(
     (activeType = type) => {
@@ -133,9 +134,16 @@ export function useFetchData(apiKey, type = 'torrents') {
   );
 
   const fetchLocalItems = useCallback(
-    async (bypassCache = false, customType = null) => {
+    async (bypassCache = false, customType = null, retryCount = 0) => {
       const activeType = customType || type;
       setLoading(true);
+      
+      // Prevent infinite retry loops
+      if (retryCount > 1) {
+        console.error('Max retry attempts reached, giving up');
+        setLoading(false);
+        return [];
+      }
 
       if (!apiKey) {
         setLoading(false);
@@ -182,10 +190,12 @@ export function useFetchData(apiKey, type = 'torrents') {
       }
 
       try {
+        perfMonitor.startTimer(`fetch-${activeType}`);
         const response = await fetch(endpoint, {
           headers: {
             'x-api-key': apiKey,
             ...(bypassCache && { 'bypass-cache': 'true' }),
+            'Cache-Control': 'no-cache', // Force fresh data to prevent cross-user contamination
           },
         });
 
@@ -196,12 +206,21 @@ export function useFetchData(apiKey, type = 'torrents') {
         }
 
         const data = await response.json();
+        perfMonitor.endTimer(`fetch-${activeType}`);
 
         if (
           data.success &&
           data.data &&
           Array.isArray(data.data)
         ) {
+          // Validate user data to prevent cross-user contamination
+          if (!validateUserData(data.data, apiKey)) {
+            console.warn(`Invalid user data detected (attempt ${retryCount + 1}/2), retrying with cache bypass`);
+            // Add a small delay before retry to avoid overwhelming the API
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return fetchLocalItems(true, customType, retryCount + 1);
+          }
+
           // Sort items by added date if available
           const sortedItems = sortItems(data.data);
 
@@ -270,6 +289,7 @@ export function useFetchData(apiKey, type = 'torrents') {
           setError(userMessage);
         }
         setLoading(false);
+        // Return empty array to prevent undefined state
         return [];
       }
     },
@@ -313,6 +333,12 @@ export function useFetchData(apiKey, type = 'torrents') {
         // For 'all' type, we need to update the appropriate individual state
         // This is a bit complex since we need to determine which type each item belongs to
         return (newItems) => {
+          // Safety check: ensure newItems is an array
+          if (!Array.isArray(newItems)) {
+            console.warn('setItems called with non-array:', newItems);
+            return;
+          }
+          
           const torrentItems = newItems.filter(item => item.assetType === 'torrents');
           const usenetItems = newItems.filter(item => item.assetType === 'usenet');
           const webdlItems = newItems.filter(item => item.assetType === 'webdl');
@@ -355,9 +381,14 @@ export function useFetchData(apiKey, type = 'torrents') {
   const checkActiveRules = useCallback(() => {
     const rules = localStorage.getItem('torboxAutomationRules');
     if (rules) {
-      const parsedRules = JSON.parse(rules);
-      const activeRules = parsedRules.filter((rule) => rule.enabled);
-      setHasActiveRules(activeRules.length > 0);
+      try {
+        const parsedRules = JSON.parse(rules);
+        const activeRules = parsedRules.filter((rule) => rule.enabled);
+        setHasActiveRules(activeRules.length > 0);
+      } catch (error) {
+        console.error('Error parsing automation rules from localStorage:', error);
+        setHasActiveRules(false);
+      }
     } else {
       setHasActiveRules(false);
     }

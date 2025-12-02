@@ -10,6 +10,7 @@ import {
 import DownloadStateBadge from './DownloadStateBadge';
 import ItemActions from './ItemActions';
 import Tooltip from '@/components/shared/Tooltip';
+import Icons from '@/components/icons';
 import { useTranslations } from 'next-intl';
 
 export default function ItemRow({
@@ -43,10 +44,26 @@ export default function ItemRow({
 
     const downloadSpeed = item.download_speed || 0;
     const totalSize = item.size || 0;
-    const downloadedSize = item.total_downloaded || 0;
     
-    // Calculate progress percentage based on downloaded vs total size
-    const progress = totalSize > 0 ? (downloadedSize / totalSize) * 100 : 0;
+    // For usenet and webdl, use the progress field if available
+    // For torrents, calculate from total_downloaded if available
+    let progress = 0;
+    let downloadedSize = 0;
+    
+    if (item.assetType === 'usenet' || item.assetType === 'webdl') {
+      // Use progress field (0-1) for usenet and webdl
+      progress = (item.progress || 0) * 100;
+      downloadedSize = totalSize * (item.progress || 0);
+    } else {
+      // For torrents, use total_downloaded if available, otherwise fall back to progress
+      downloadedSize = item.total_downloaded || 0;
+      if (totalSize > 0 && downloadedSize > 0) {
+        progress = (downloadedSize / totalSize) * 100;
+      } else if (item.progress !== undefined) {
+        progress = (item.progress || 0) * 100;
+        downloadedSize = totalSize * (item.progress || 0);
+      }
+    }
     
     // Calculate ETA based on remaining size and speed
     const remainingSize = totalSize - downloadedSize;
@@ -111,6 +128,11 @@ export default function ItemRow({
                     }`}
                   ></span>
                 </Tooltip>
+                {item.private && (
+                  <Tooltip content="Private Tracker">
+                    <Icons.Private className="h-4 w-4 text-orange-500 dark:text-orange-400" />
+                  </Tooltip>
+                )}
                 {item.name && (
                   <Tooltip content={!isBlurred ? item.name : ''}>
                     <span>{item.name || 'Unnamed Item'}</span>
@@ -297,6 +319,23 @@ export default function ItemRow({
                  item.assetType === 'webdl' ? 'Web' : 'Unknown'}
               </span>
             </div>
+          </td>
+        );
+      case 'private':
+        return (
+          <td
+            key={columnId}
+            className="px-4 py-4 whitespace-nowrap text-sm text-primary-text/70 dark:text-primary-text-dark/70"
+            style={baseStyle}
+          >
+            {item.private ? (
+              <div className="flex items-center gap-2">
+                <Icons.Private className="h-4 w-4 text-orange-500 dark:text-orange-400" />
+                <span>Private</span>
+              </div>
+            ) : (
+              <span>Public</span>
+            )}
           </td>
         );
       case 'error':

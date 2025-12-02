@@ -35,6 +35,7 @@ export const API_RESPONSE_TYPES = {
     files: 'TORRENT_FILE[]',
     inactive_check: 'number',
     availability: 'number',
+    private: 'boolean',
   },
 
   TORRENT_FILE: {
@@ -275,12 +276,6 @@ export const API_RESPONSE_TYPES = {
     size: 'number',
   },
 
-  // Speed test types
-  SPEEDTEST_FILE: {
-    name: 'string',
-    size: 'number',
-    url: 'string',
-  },
 };
 
 // API Error types

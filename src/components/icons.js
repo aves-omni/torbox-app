@@ -89,22 +89,6 @@ const UploadIcon = ({ className = 'h-5 w-5' }) => (
   </svg>
 );
 
-const SpeedIcon = ({ className = 'h-5 w-5' }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M13 10V3L4 14h7v7l9-11h-7z"
-    />
-  </svg>
-);
 
 const WarningIcon = ({ className = 'h-5 w-5' }) => (
   <svg
@@ -1146,6 +1130,23 @@ const CollapseAllIcon = ({ className = 'h-4 w-4' }) => (
   </svg>
 );
 
+const PrivateIcon = ({ className = 'h-4 w-4' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+    />
+  </svg>
+);
+
 const AllIcon = ({ className = 'h-4 w-4' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -1232,7 +1233,6 @@ export const Icons = {
   Activity: ActivityIcon,
   DollarSign: DollarSignIcon,
   RotateCcw: RotateCcwIcon,
-  Speed: SpeedIcon,
   Warning: WarningIcon,
   Spinner: SpinnerIcon,
   Cloud: CloudIcon,
@@ -1246,6 +1246,7 @@ export const Icons = {
   All: AllIcon,
   ExpandAll: ExpandAllIcon,
   CollapseAll: CollapseAllIcon,
+  Private: PrivateIcon,
 };
 
 export default Icons;

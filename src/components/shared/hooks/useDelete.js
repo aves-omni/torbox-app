@@ -56,6 +56,8 @@ export function useDelete(
 
   const batchDelete = async (ids, items = []) => {
     try {
+      let successfulIds = [];
+      
       // For 'all' type, we need to group items by their asset type and delete them separately
       if (assetType === 'all' && items.length > 0) {
         const groupedItems = {
@@ -73,23 +75,26 @@ export function useDelete(
         });
         
         // Delete each group separately
-        const allSuccessfulIds = [];
         for (const [type, typeIds] of Object.entries(groupedItems)) {
           if (typeIds.length > 0) {
-            const successfulIds = await batchDeleteHelper(typeIds, apiKey, type);
-            allSuccessfulIds.push(...successfulIds);
+            const typeSuccessfulIds = await batchDeleteHelper(typeIds, apiKey, type);
+            successfulIds.push(...typeSuccessfulIds);
           }
         }
-        
-        return allSuccessfulIds;
       } else {
-        const successfulIds = await batchDeleteHelper(ids, apiKey, assetType);
-        return successfulIds;
+        successfulIds = await batchDeleteHelper(ids, apiKey, assetType);
       }
 
       // Update UI for successful deletes
       if (successfulIds.length > 0) {
-        setItems((prev) => prev.filter((t) => !successfulIds.includes(t.id)));
+        setItems((prev) => {
+          // Safety check: ensure prev is an array
+          if (!Array.isArray(prev)) {
+            console.warn('setItems called with non-array prev:', prev);
+            return prev || [];
+          }
+          return prev.filter((t) => !successfulIds.includes(t.id));
+        });
         setSelectedItems((prev) => ({
           items: new Set(
             [...prev.items].filter((id) => !successfulIds.includes(id)),

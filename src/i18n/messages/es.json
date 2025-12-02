@@ -65,7 +65,7 @@
     "footer": {
       "description": "No almacenamos ninguna de sus información. Esta aplicación es completamente de código abierto en",
       "github": "GitHub",
-      "forkNote": "Este es un fork del TorBox Manager de jittarao"
+      "forkNote": "Este es un fork del TorBox Manager de jittarao. v0.1.27"
     }
   },
   "ApiKeyInput": {
@@ -86,7 +86,8 @@
     "add": "Añadir",
     "deleteKey": "Eliminar clave",
     "noKeys": "No hay claves guardadas",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "toggleOpen": "Mantener abierto"
   },
   "ActionButtons": {
     "downloadLinks": "Obtener enlaces de descarga",
@@ -136,7 +137,7 @@
     "seasonPlaceholder": "S01",
     "episodePlaceholder": "E01",
     "yearPlaceholder": "2024",
-    "quality.all": "Todas las calidades",
+    "qualityAll": "Todas las calidades",
     "minSize": "Tamaño min. (GB)",
     "minSeeders": "Seeders min.",
     "clearFilters": "Limpiar filtros"
@@ -181,6 +182,11 @@
       "Web": "Web",
       "webdl": "webdl",
       "Webdl": "Webdl"
+    },
+    "uploadSections": {
+      "torrents": "Subir torrents",
+      "usenet": "Subir archivos NZB",
+      "webdl": "Añadir descargas web"
     },
     "time": {
       "in": "en ",
@@ -324,7 +330,13 @@
       "stalledTime": "Tiempo de pausa",
       "seedingRatio": "Proporción de siembra",
       "seeds": "Semillas",
-      "peers": "Pares"
+      "peers": "Pares",
+      "downloadSpeed": "Velocidad de descarga",
+      "uploadSpeed": "Velocidad de subida",
+      "fileSize": "Tamaño de archivo",
+      "age": "Edad",
+      "tracker": "Tracker",
+      "inactive": "Descargas inactivas"
     },
     "operators": {
       "gt": "es mayor que",
@@ -344,6 +356,15 @@
       "show": "Mostrar reglas",
       "hide": "Ocultar reglas"
     },
+    "presets": {
+      "title": "Configuraciones Rápidas",
+      "deleteInactive": "Eliminar Descargas Inactivas",
+      "deleteStalled": "Eliminar Descargas Bloqueadas (1+ horas)",
+      "deleteQueued": "Eliminar Descargas en Cola (6+ horas)",
+      "stopSeedingLowRatio": "Detener Seeding con Ratio Bajo",
+      "deleteUnavailable": "Eliminar Torrents No Disponibles",
+      "deleteIncomplete": "Eliminar Torrents Incompletos"
+    },
     "cancel": "Cancelar",
     "add": "Añadir regla",
     "update": "Actualizar regla",
@@ -354,7 +375,17 @@
     "neverExecuted": "nunca ejecutado",
     "lastTriggered": "último activado",
     "triggers": "activadores",
-    "enabledAt": "habilitado a"
+    "enabledAt": "habilitado a",
+    "viewLogs": "Ver Registros",
+    "ruleLogs": "Registros de Regla",
+    "clearLogs": "Limpiar Registros",
+    "close": "Cerrar",
+    "noLogs": "No hay registros disponibles",
+    "success": "Éxito",
+    "failed": "Falló",
+    "itemsAffected": "Elementos Afectados",
+    "details": "Detalles",
+    "error": "Error"
   },
   "Columns": {
     "id": "ID",
@@ -379,6 +410,7 @@
     "original_url": "URL de origen",
     "expires_at": "Caduca a",
     "asset_type": "Tipo",
+    "private": "Tracker Privado",
     "actions": "Acciones"
   },
   "Statuses": {
@@ -594,6 +626,10 @@
     "lastCheck": "Última Verificación",
     "itemCount": "Elementos",
     "actions": "Acciones",
+    "status": "Estado",
+    "items": "Elementos",
+    "active": "Activo",
+    "inactive": "Inactivo",
     "noFeeds": "No hay feeds RSS configurados",
     "never": "Nunca",
     "loading": "Cargando feeds RSS...",
@@ -629,7 +665,7 @@
     }
   },
   "RssItems": {
-    "title": "Elementos RSS",
+    "title": "Título",
     "refresh": "Actualizar",
     "selectFeed": "Seleccionar Feed RSS",
     "selectFeedPlaceholder": "Elija un feed para ver elementos",
@@ -642,7 +678,6 @@
     "webdl": "Descarga Web",
     "sortBy": "Ordenar Por",
     "date": "Fecha",
-    "title": "Título",
     "size": "Tamaño",
     "sortOrder": "Orden de Clasificación",
     "newestFirst": "Más Recientes Primero",
@@ -660,6 +695,27 @@
       "noLink": "No hay enlace de descarga disponible",
       "downloadStarted": "Descarga iniciada exitosamente",
       "downloadFailed": "No se pudo iniciar la descarga"
+    }
+  },
+  "CloudUpload": {
+    "title": "Gestor de Almacenamiento en la Nube",
+    "manageConnections": "Gestionar Conexiones",
+    "connectedProviders": "Proveedores Conectados",
+    "connected": "Conectado",
+    "notConnected": "No Conectado",
+    "connect": "Conectar",
+    "disconnect": "Desconectar",
+    "activeJobs": "Trabajos Activos",
+    "noActiveJobs": "No hay trabajos activos",
+    "cancel": "Cancelar",
+    "complete": "Completar",
+    "toast": {
+      "connectionSuccess": "Conectado exitosamente al proveedor",
+      "connectionError": "Error al conectar con el proveedor",
+      "disconnectionSuccess": "Desconectado exitosamente del proveedor",
+      "disconnectionError": "Error al desconectar del proveedor",
+      "jobCancelled": "Trabajo cancelado exitosamente",
+      "jobCancelError": "Error al cancelar el trabajo"
     }
   },
   "User": {
@@ -682,6 +738,7 @@
       "totalDownloads": "Total de Descargas",
       "totalSize": "Total Descargado",
       "totalUploaded": "Total Subido",
+      "ratio": "Proporción",
       "torrentDownloads": "Descargas de Torrent",
       "webDownloads": "Descargas Web",
       "usenetDownloads": "Descargas Usenet"

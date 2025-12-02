@@ -9,30 +9,48 @@ import {
 export async function GET() {
   const headersList = await headers();
   const apiKey = headersList.get('x-api-key');
-  const bypassCache = headersList.get('bypass-cache') === 'true';
+  
+  // Always bypass cache for user-specific data to prevent cross-user contamination
+  const bypassCache = true;
 
   try {
-    // Fetch both regular and queued torrents in parallel
+    // Add timestamp to force cache bypass
+    const timestamp = Date.now();
+    
+    // Fetch both regular and queued torrents in parallel with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     const [torrentsResponse, queuedResponse] = await Promise.all([
       fetch(
-        `${API_BASE}/${API_VERSION}/api/torrents/mylist${bypassCache ? '?bypass_cache=true' : ''}`,
+        `${API_BASE}/${API_VERSION}/api/torrents/mylist?bypass_cache=true&_t=${timestamp}`,
         {
           headers: {
             Authorization: `Bearer ${apiKey}`,
             'User-Agent': `TorBoxManager/${TORBOX_MANAGER_VERSION}`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
           },
+          signal: controller.signal,
         },
       ),
       fetch(
-        `${API_BASE}/${API_VERSION}/api/queued/getqueued?type=torrent${bypassCache ? '&bypass_cache=true' : ''}`,
+        `${API_BASE}/${API_VERSION}/api/queued/getqueued?type=torrent&bypass_cache=true&_t=${timestamp}`,
         {
           headers: {
             Authorization: `Bearer ${apiKey}`,
             'User-Agent': `TorBoxManager/${TORBOX_MANAGER_VERSION}`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
           },
+          signal: controller.signal,
         },
       ),
     ]);
+    
+    clearTimeout(timeoutId);
 
     const [torrentsData, queuedData] = await Promise.all([
       torrentsResponse.json(),
@@ -45,8 +63,25 @@ export async function GET() {
       data: [...(torrentsData.data || []), ...(queuedData.data || [])],
     };
 
-    return Response.json(mergedData);
+    return Response.json(mergedData, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Vary': 'Authorization', // Ensure cache varies by user
+      },
+    });
   } catch (error) {
+    console.error('Error fetching torrents:', error);
+    
+    // Handle timeout specifically
+    if (error.name === 'AbortError') {
+      return Response.json({ 
+        success: false, 
+        error: 'Request timeout - API took longer than 30 seconds to respond' 
+      }, { status: 408 });
+    }
+    
     return Response.json(
       { success: false, error: error.message },
       { status: 500 },

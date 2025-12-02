@@ -24,7 +24,6 @@
       "linkHistory": "Link History",
       "archived": "Archived",
       "rss": "RSS Feeds",
-      "speedtest": "Speed Test",
       "user": "User",
       "systemStatus": "System Status",
       "referrals": "Referrals",
@@ -66,7 +65,7 @@
     "footer": {
       "description": "We don't store any of your information. This app is fully open source on",
       "github": "GitHub",
-      "forkNote": "This is a fork of jittarao's TorBox Manager"
+      "forkNote": "This is a fork of jittarao's TorBox Manager. v0.1.27"
     }
   },
   "ApiKeyInput": {
@@ -87,7 +86,8 @@
     "add": "Add",
     "deleteKey": "Delete Key",
     "noKeys": "No saved keys",
-    "close": "Close"
+    "close": "Close",
+    "toggleOpen": "Toggle Open"
   },
   "Referral": {
     "referral": "Referral",
@@ -104,21 +104,6 @@
     "error": "Error copying to clipboard",
     "developerNote": "These are the developer's referral codes",
     "visitLink": "Visit Link"
-  },
-  "Speedtest": {
-    "title": "Speed Test",
-    "description": "Test your connection speed to TorBox servers worldwide",
-    "serverPingResults": "Server Ping Results",
-    "refresh": "Refresh",
-    "loadingRegions": "Loading regions...",
-    "startSpeedTest": "Start Speed Test",
-    "runningSpeedTest": "Running Speed Test...",
-    "runTestAgain": "Run Test Again",
-    "location": "Location",
-    "ping": "Ping",
-    "downloadSpeed": "Download Speed",
-    "uploadSpeed": "Upload Speed",
-    "pleaseEnterApiKey": "Please enter your API key to use the speed test"
   },
   "ActionButtons": {
     "downloadLinks": "Get Download Links",
@@ -160,7 +145,7 @@
     "seasonPlaceholder": "S01",
     "episodePlaceholder": "E01",
     "yearPlaceholder": "2024",
-    "quality.all": "All Qualities",
+    "qualityAll": "All Qualities",
     "minSize": "Min Size (GB)",
     "minSeeders": "Min Seeders",
     "clearFilters": "Clear Filters"
@@ -205,6 +190,11 @@
       "Web": "Web",
       "webdl": "webdl",
       "Webdl": "Webdl"
+    },
+    "uploadSections": {
+      "torrents": "Upload Torrents",
+      "usenet": "Upload NZB Files",
+      "webdl": "Add Web Downloads"
     },
     "time": {
       "in": "in ",
@@ -363,7 +353,13 @@
       "stalledTime": "Stalled Time",
       "seedingRatio": "Seeding Ratio",
       "seeds": "Seeds",
-      "peers": "Peers"
+      "peers": "Peers",
+      "downloadSpeed": "Download Speed",
+      "uploadSpeed": "Upload Speed",
+      "fileSize": "File Size",
+      "age": "Age",
+      "tracker": "Tracker",
+      "inactive": "Inactive Downloads"
     },
     "operators": {
       "gt": "is greater than",
@@ -383,6 +379,15 @@
       "show": "Show rules",
       "hide": "Hide rules"
     },
+    "presets": {
+      "title": "Quick Presets",
+      "deleteInactive": "Delete Inactive Downloads",
+      "deleteStalled": "Delete Stalled Downloads (1+ hours)",
+      "deleteQueued": "Delete Queued Downloads (6+ hours)",
+      "stopSeedingLowRatio": "Stop Seeding Low Ratio",
+      "deleteUnavailable": "Delete Unavailable Torrents",
+      "deleteIncomplete": "Delete Incomplete Torrents"
+    },
     "cancel": "Cancel",
     "add": "Add Rule",
     "update": "Update Rule",
@@ -393,7 +398,17 @@
     "neverExecuted": "never executed",
     "lastTriggered": "last triggered",
     "triggers": "triggers",
-    "enabledAt": "enabled"
+    "enabledAt": "enabled",
+    "viewLogs": "View Logs",
+    "ruleLogs": "Rule Logs",
+    "clearLogs": "Clear Logs",
+    "close": "Close",
+    "noLogs": "No logs available",
+    "success": "Success",
+    "failed": "Failed",
+    "itemsAffected": "Items Affected",
+    "details": "Details",
+    "error": "Error"
   },
   "Columns": {
     "id": "ID",
@@ -418,6 +433,7 @@
     "original_url": "Source URL",
     "expires_at": "Expires At",
     "asset_type": "Type",
+    "private": "Private Tracker",
     "actions": "Actions"
   },
   "Statuses": {
@@ -648,6 +664,10 @@
     "lastCheck": "Last Check",
     "itemCount": "Items",
     "actions": "Actions",
+    "status": "Status",
+    "items": "Items",
+    "active": "Active",
+    "inactive": "Inactive",
     "noFeeds": "No RSS feeds configured",
     "never": "Never",
     "loading": "Loading RSS feeds...",
@@ -696,8 +716,6 @@
     "webdl": "Web Download",
     "sortBy": "Sort By",
     "date": "Date",
-    "title": "Title",
-    "size": "Size",
     "sortOrder": "Sort Order",
     "newestFirst": "Newest First",
     "oldestFirst": "Oldest First",
@@ -707,6 +725,7 @@
     "noMatchingItems": "No items match your search criteria",
     "download": "Download",
     "published": "Published",
+    "size": "Size",
     "category": "Category",
     "noDescription": "No description available",
     "unknown": "Unknown",
@@ -757,6 +776,7 @@
       "totalDownloads": "Total Downloads",
       "totalSize": "Total Downloaded",
       "totalUploaded": "Total Uploaded",
+      "ratio": "Ratio",
       "torrentDownloads": "Torrent Downloads",
       "webDownloads": "Web Downloads",
       "usenetDownloads": "Usenet Downloads"
